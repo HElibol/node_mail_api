@@ -57,8 +57,8 @@ app.get('/users/:userId/emails', async (req, res) => {
       const formatted = graphRes.data.value
       .filter(msg => msg.from?.emailAddress?.address !== "noreply@emeaemail.teams.microsoft.com")
       .map((msg) => ({
+        fromName: msg.from?.emailAddress?.name,
         fromEmail: msg.from?.emailAddress?.address,
-        preview: msg.bodyPreview,
       }));
   
       res.json(formatted);
