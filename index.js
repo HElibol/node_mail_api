@@ -54,11 +54,14 @@ app.get('/users/:userId/emails', async (req, res) => {
         headers: { Authorization: `Bearer ${token}` },
       });
   
+
+
       const formatted = graphRes.data.value
       .filter(msg => msg.from?.emailAddress?.address !== "noreply@emeaemail.teams.microsoft.com")
       .map((msg) => ({
         fromName: msg.from?.emailAddress?.name,
         fromEmail: msg.from?.emailAddress?.address,
+        subject: msg.subject,
       }));
   
       res.json(formatted);
