@@ -62,6 +62,7 @@ app.get('/users/:userId/emails', async (req, res) => {
         fromName: msg.from?.emailAddress?.name,
         fromEmail: msg.from?.emailAddress?.address,
         subject: msg.subject,
+        bodyPreview: msg.bodyPreview
       }));
   
       res.json(formatted);
