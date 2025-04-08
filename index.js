@@ -8,8 +8,8 @@ const app = express();
 const PORT = 3000;
 
 app.use(cors());
-
-
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // MSAL config
 const msalConfig = {
@@ -72,6 +72,34 @@ app.get('/users/:userId/emails', async (req, res) => {
     }
   });
 
+  app.post('/users/emails', async (req, res) => {
+    
+    try {
+      console.log(req.body);
+      const { userId } = req.body;
+      const token = await getToken();
+      const url = `https://graph.microsoft.com/v1.0/users/${userId}/mailFolders/Inbox/messages?$top=10&$orderby=receivedDateTime desc&$select=subject,from,receivedDateTime,bodyPreview`;
+      const graphRes = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+
+
+      const formatted = graphRes.data.value
+      .filter(msg => msg.from?.emailAddress?.address !== "noreply@emeaemail.teams.microsoft.com")
+      .map((msg) => ({
+        fromName: msg.from?.emailAddress?.name,
+        fromEmail: msg.from?.emailAddress?.address,
+        subject: msg.subject,
+        bodyPreview: msg.bodyPreview
+      }));
+  
+      res.json(formatted);
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+      res.status(500).send('Mailler okunamadı.');
+    }
+  });
 app.listen(PORT, () => {
   console.log(`API çalışıyor: http://localhost:${PORT}`);
 });
